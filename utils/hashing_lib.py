@@ -22,9 +22,10 @@ class BloomFilter:
         self.filter = np.zeros(m)
         self.primes = LastPrimes(m, 100)
 
-    def add_to_filter(self, index):
-        if self.filter[index] == 0:
-            self.filter[index] = 1
+    def add_to_filter(self, hash_values):
+        for value in hash_values:
+            if self.filter[value] == 0:
+                self.filter[value] = 1
 
     def hash_function(self, passwords_list, p):
         values = []
@@ -37,5 +38,6 @@ class BloomFilter:
             for i in range(int(last_c[-1]) + 10):
                 value += str(ord(password[-i]))[-1]
 
-            value = (int(value) * p + ord(password[0])) % mod
-            add_to_filter(value)
+            values.append((int(value) * p + ord(password[0])) % mod)
+
+        return values
