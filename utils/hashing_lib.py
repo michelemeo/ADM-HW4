@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 def LastPrimes(n, last_primes):
     p = []
@@ -22,12 +23,12 @@ class BloomFilter:
         self.filter = np.zeros(m)
         self.primes = LastPrimes(m, 100)
 
-    def add_to_filter(self, hash_values):
-        for value in hash_values:
-            if self.filter[value] == 0:
-                self.filter[value] = 1
 
-    def hash_function(self, passwords_list, p):
+    def add_to_filter(self, hash_values):
+        self.filter[hash_values] = 1
+
+
+    def hash_function(self, passwords_list, multiplier, increment):
         values = []
         mod = self.primes[0]
 
@@ -38,6 +39,6 @@ class BloomFilter:
             for i in range(int(last_c[-1]) + 10):
                 value += str(ord(password[-i]))[-1]
 
-            values.append((int(value) * p + ord(password[0])) % mod)
+            values.append((int(value) * multiplier + ord(password[increment])) % mod)
 
-        return values
+        return np.array(values)
