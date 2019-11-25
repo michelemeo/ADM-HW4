@@ -22,23 +22,63 @@ class BloomFilter:
     def __init__(self, m):
         self.filter = np.zeros(m)
         self.primes = LastPrimes(m, 100)
+        self.duplicates = []
 
 
     def add_to_filter(self, hash_values):
         self.filter[hash_values] = 1
 
 
-    def hash_function(self, passwords_list, multiplier, increment):
-        values = []
+    def hash_function(self, password, multiplier, n_char):
         mod = self.primes[0]
 
+        value = ""
+        c = str(ord(password[-1-n_char]))
+
+        for i in range(int(c[-1]) + 10):
+            value += str(ord(password[-i]))[-1]
+
+        return (int(value) * multiplier + ord(password[n_char])) % mod
+
+
+    def multi_hash_functions(self, passwords_list, n_functions):
+        values = []
+
         for password in passwords_list:
-            value = ""
-            last_c = str(ord(password[-1]))
+            multi_value = []
+            p = 5
 
-            for i in range(int(last_c[-1]) + 10):
-                value += str(ord(password[-i]))[-1]
+            for k in range(n_functions):
+                hash_value = self.hash_function(password, self.primes[p], k)
+                multi_value.append(hash_value)
+                p += 15
 
-            values.append((int(value) * multiplier + ord(password[increment])) % mod)
+            self.add_to_filter(multi_value)
+            values.append(multi_value)
 
         return np.array(values)
+
+
+    def hash_values_detector(self, hash_values, n_functions):
+        if np.sum(self.filter[hash_values]) == n_functions:
+            return 1
+        else:
+            return 0
+
+
+    def hash_searching(self, new_passwords, n_functions):
+        positive_cases = 0
+
+        for password in new_passwords:
+            values = []
+            p = 5
+
+            for k in range(n_functions):
+                hash_value = self.hash_function(password, self.primes[p], k)
+                values.append(hash_value)
+                p += 15
+
+            positive_cases += self.hash_values_detector(values, n_functions)
+            self.duplicates.append(password)
+
+        return positive_cases
