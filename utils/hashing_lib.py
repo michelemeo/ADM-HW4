@@ -41,25 +41,32 @@ class BloomFilter:
         return (int(value) * multiplier + ord(password[n_char])) % mod
 
 
-    def multi_hash_functions(self, passwords_list, n_functions):
+    def testing_hash_function(self, passwords_list):
         values = []
 
         for password in passwords_list:
-            multi_value = []
+            hash_value = self.hash_function(password, self.primes[5], 0)
+            values.append(hash_value)
+
+        return values
+
+
+    def multi_hash_functions(self, passwords_list, n_functions):
+
+        for password in passwords_list:
+            values = []
             p = 5
 
             for k in range(n_functions):
                 hash_value = self.hash_function(password, self.primes[p], k)
-                multi_value.append(hash_value)
+                values.append(hash_value)
                 p += 15
 
-            self.add_to_filter(multi_value)
-            values.append(multi_value)
-
-        return np.array(values)
+            self.add_to_filter(values)
 
 
     def hash_values_detector(self, hash_values, n_functions):
+
         if np.sum(self.filter[hash_values]) == n_functions:
             return 1
         else:
@@ -78,7 +85,8 @@ class BloomFilter:
                 values.append(hash_value)
                 p += 15
 
-            positive_cases += self.hash_values_detector(values, n_functions)
-            self.duplicates.append(password)
+            if self.hash_values_detector(values, n_functions) == 1:
+                positive_cases += 1
+                self.duplicates.append(password)
 
         return positive_cases
