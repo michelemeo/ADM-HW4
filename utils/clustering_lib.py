@@ -51,4 +51,21 @@ class Kmeans:
 
         for k in range(self.K):
             midpoint = np.mean(self.Cluster[k+1], axis=0)
-            self.C[k] = midpoint
+            
+            if len(self.Cluster[k+1]) != 0:
+                self.C[k] = midpoint
+            else:
+                continue
+            
+        self.Cluster = {i+1:[] for i in range(self.K)}
+            
+            
+    def cost_function(self):
+        cost = 0
+        
+        for k in range(self.K):
+            for point in self.Cluster[k+1]:
+                cost += distance(point, self.C[k])**2
+                
+        return cost
+       
