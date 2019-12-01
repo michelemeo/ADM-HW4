@@ -1,6 +1,9 @@
 import numpy as np
 import math
 
+
+# given a number "n", this function calculates the first "last_primes" prime numbers smaller and closer to "n"
+# and stores them in a list
 def LastPrimes(n, last_primes):
     p = []
 
@@ -17,18 +20,23 @@ def LastPrimes(n, last_primes):
     return p
 
 
-class BloomFilter:
 
+class BloomFilter:
+    
+    # the creation of a BloomFilter object defines an array of zeros of chosen size "m", the filter;
+    # then the prime numbers next to "m" are automatically calculated and an empty list for duplicates is created
     def __init__(self, m):
         self.filter = np.zeros(m)
         self.primes = LastPrimes(m, 100)
         self.duplicates = []
 
-
+    
+    # switch the value of the indexes calculated with the hash functions from 0 to 1
     def add_to_filter(self, hash_values):
         self.filter[hash_values] = 1
 
-
+        
+    # the hash function is well explained in the main.ipnyb
     def hash_function(self, password, multiplier, n_char):
         mod = self.primes[0]
 
@@ -40,7 +48,9 @@ class BloomFilter:
 
         return (int(value) * multiplier + ord(password[n_char])) % mod
 
-
+    
+    # return a list of the hash values of the input password list,
+    # useful for testing the uniformity of their distribution
     def testing_hash_function(self, passwords_list):
         values = []
 
@@ -51,6 +61,9 @@ class BloomFilter:
         return values
 
 
+    # the function used to apply different hash functions: as mentioned in main.ipynb, 
+    # the parameters for which the functions differ are the character index, here "k",
+    # and the prime multiplier number, here "self.primes [p]"
     def multi_hash_functions(self, passwords_list, n_functions):
 
         for password in passwords_list:
@@ -65,6 +78,9 @@ class BloomFilter:
             self.add_to_filter(values)
 
 
+    # to check if the set of "hash_values" is already contained in the filter, it is enough
+    # to sum the filter values contained in those "hash_values" indexes: if their sum is equal
+    # to the number of hash functions, the element is a duplicate        
     def hash_values_detector(self, hash_values, n_functions):
 
         if np.sum(self.filter[hash_values]) == n_functions:
@@ -73,6 +89,8 @@ class BloomFilter:
             return 0
 
 
+    # this function recycles the functions seen above to check for duplicates of an entire list of passwords;
+    # if a duplicate is found, it stores this in a list
     def hash_searching(self, new_passwords, n_functions):
         positive_cases = 0
 
