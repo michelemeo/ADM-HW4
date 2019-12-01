@@ -4,3 +4,7 @@ Group #12 is composed by:
 - Michele Meo
 - Giulio Rago
 - Vishal Matta
+
+## Repository structure
+
+### Script description
